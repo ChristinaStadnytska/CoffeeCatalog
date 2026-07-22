@@ -1,0 +1,45 @@
+# Xcode
+## User settings
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+
+## Build generated
+build/
+DerivedData/
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+## Swift Package Manager
+.build/
+.swiftpm/
+
+## macOS
+.DS_Store
+
+# Personal / non-project files (kept out of the public repo)
+Khrystyna_iOS_CV.docx
+STAR-*.docx
+Mock-Interview-*.md
+algorithms_cheatsheet.md
+plan_poshuku_roboti.md
+vacancies.md
+grafik_pidgotovky.md
+build_cv.js
+package.json
+package-lock.json
+node_modules/

@@ -10,10 +10,32 @@ import Testing
 
 struct CoffeeCatalogTests {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
-        // Swift Testing Documentation
-        // https://developer.apple.com/documentation/testing
+    @Test @MainActor
+    func fetchCoffeeList_success_updatesCoffees() async throws {
+        let modelLatte = CoffeeModel(title: "Latte")
+        let modelEspresso = CoffeeModel(title: "Espresso")
+        let mockService = MockNetworkService()
+        mockService.resultToReturn = [modelLatte, modelEspresso]
+        let viewModel = CoffeeListViewModel(coffees: [], service: mockService)
+        
+        await viewModel.getCoffeeList()
+        
+        #expect(viewModel.viewState == .loaded)
+        #expect(viewModel.coffees == [modelLatte, modelEspresso])
     }
-
+    
+    @Test @MainActor
+    func fetchCoffeeList_failure_setsErrorState() async throws {
+        let mockService = MockNetworkService()
+        mockService.errorToThrow = NetworkError.invalidURL
+        let viewModel = CoffeeListViewModel(coffees: [], service: mockService)
+        
+        await viewModel.getCoffeeList()
+        
+        if case .error = viewModel.viewState {
+            #expect(viewModel.coffees.isEmpty)
+        } else {
+            Issue.record("Expected .error state")
+        }
+    }
 }
