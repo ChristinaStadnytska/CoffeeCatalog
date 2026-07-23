@@ -43,3 +43,6 @@ build_cv.js
 package.json
 package-lock.json
 node_modules/
+
+# Learning playground — not part of the app
+CombinePractice.playground/
