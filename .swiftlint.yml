@@ -1,0 +1,27 @@
+# CoffeeCatalog SwiftLint configuration
+# Docs: https://github.com/realm/SwiftLint/blob/main/Rules.md
+
+excluded:
+  - CombinePractice.playground   # scratch/practice code, not part of the app
+  - CoffeeCatalog.xcodeproj
+  - ai-commands-to-move
+
+disabled_rules:
+  - todo
+  - trailing_whitespace
+  - closure_spacing
+
+opt_in_rules:
+  - force_unwrapping              # flags `!` explicitly - not on by default, worth the discipline
+  - empty_count                   # prefer `.isEmpty` over `.count == 0`
+  - closure_spacing
+
+line_length:
+  warning: 140
+  error: 200
+
+identifier_name:
+  min_length:
+    warning: 2
+  excluded:
+    - id

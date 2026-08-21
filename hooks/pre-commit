@@ -1,0 +1,36 @@
+#!/bin/sh
+# CoffeeCatalog pre-flight check — runs locally before every commit.
+#
+# Install (once per machine):
+#   git config core.hooksPath hooks
+#   chmod +x hooks/pre-commit
+#
+# Committing this file under hooks/ (instead of only living in .git/hooks/)
+# means the whole team gets it automatically after `git pull` + the one-time
+# `git config` above — .git/hooks itself is never tracked by git.
+
+set -e
+
+SCHEME="CoffeeCatalog"                              # adjust if your scheme name differs
+DESTINATION="platform=iOS Simulator,name=iPhone 15" # adjust to a simulator you have installed
+
+echo "Pre-flight check starting..."
+
+# 1. SwiftLint — catch style/convention issues before they ever reach CI
+if which swiftlint >/dev/null 2>&1; then
+  echo "-> Running SwiftLint..."
+  swiftlint lint --strict
+else
+  echo "SwiftLint not installed, skipping (brew install swiftlint)"
+fi
+
+# 2. Fast build check — catch compile errors on your machine, in seconds,
+#    instead of finding out a few minutes later on a paid macOS CI runner.
+echo "-> Running build check..."
+xcodebuild build \
+  -scheme "$SCHEME" \
+  -destination "$DESTINATION" \
+  -quiet \
+  CODE_SIGNING_ALLOWED=NO
+
+echo "Pre-flight check passed - safe to commit."

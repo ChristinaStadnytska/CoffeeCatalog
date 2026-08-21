@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum CoffeeCategory: String {
+    case hot, iced
+}
+
 struct CoffeeModel: Identifiable, Hashable, Codable {
     let id: UUID
     let serverId: Int?

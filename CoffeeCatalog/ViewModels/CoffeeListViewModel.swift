@@ -6,7 +6,7 @@
 //
 
 import Foundation
-internal import Combine
+import Combine
 
 enum CoffeeListViewState: Equatable {
     case `default`
@@ -15,15 +15,32 @@ enum CoffeeListViewState: Equatable {
     case error(String)
 }
 
-final class CoffeeListViewModel: ObservableObject {
-    @Published var coffees: [CoffeeModel]
-    @Published var viewState: CoffeeListViewState = .default
+@Observable final class CoffeeListViewModel {
+    var coffees: [CoffeeModel]
+    var viewState: CoffeeListViewState = .default
+    var searchText = "" {
+        didSet {
+            searchSubject.send(searchText)
+        }
+    }
+    var displayedCoffees: [CoffeeModel] {
+        debouncedSearchText.isEmpty ? coffees : coffees.filter { $0.title.localizedCaseInsensitiveContains(debouncedSearchText) }
+    }
+    private var debouncedSearchText = ""
+    private let searchSubject = PassthroughSubject<String, Never>()
+    private var cancellables = Set<AnyCancellable>()
     private let service: NetworkServiceInterface
 
     init(coffees: [CoffeeModel],
          service: NetworkServiceInterface = NetworkService()) {
         self.coffees = coffees
         self.service = service
+        searchSubject
+            .debounce(for: .milliseconds(300), scheduler: DispatchQueue.main)
+            .sink { [weak self] query in
+                self?.debouncedSearchText = query
+            }
+            .store(in: &cancellables)
     }
 
     @MainActor
@@ -32,7 +49,7 @@ final class CoffeeListViewModel: ObservableObject {
         
         viewState = .loading
         do {
-            coffees = try await service.fetchCoffeeList()
+            coffees = try await service.fetchCoffeeList(category: .hot)
             viewState = .loaded
         } catch {
             viewState = .error(error.localizedDescription)

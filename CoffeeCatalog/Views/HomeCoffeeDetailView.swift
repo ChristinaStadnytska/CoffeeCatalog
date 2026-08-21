@@ -8,7 +8,16 @@
 import SwiftUI
 
 struct HomeCoffeeDetailView: View {
-    let coffeeItem: CoffeeModel
+    private let coffeeItem: CoffeeModel
+    @State private var isFavourite: Bool
+    let onFavouriteTapped: (CoffeeModel) -> Void
+    
+    init(coffeeItem: CoffeeModel,
+         onFavouriteTapped: @escaping (CoffeeModel) -> Void) {
+        self.coffeeItem = coffeeItem
+        self.onFavouriteTapped = onFavouriteTapped
+        _isFavourite = State(initialValue: coffeeItem.favourite)
+    }
     
     var body: some View {
         VStack(spacing: 20) {
@@ -25,6 +34,12 @@ struct HomeCoffeeDetailView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             }
+            
+            Toggle("Is it your favourite?", isOn: $isFavourite)
+                .onChange(of: isFavourite, { _, _ in
+                    onFavouriteTapped(coffeeItem)
+                })
+                .padding()
             Spacer()
         }
         .padding()
@@ -35,5 +50,5 @@ struct HomeCoffeeDetailView: View {
 
 #Preview {
     let testCoffeeItem: CoffeeModel = .init(title: "Latte", description: "Description", ingredients: nil, image: nil, favourite: false)
-    HomeCoffeeDetailView(coffeeItem: testCoffeeItem)
+    HomeCoffeeDetailView(coffeeItem: testCoffeeItem, onFavouriteTapped: {_ in})
 }

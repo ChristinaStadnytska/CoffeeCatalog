@@ -12,7 +12,7 @@ final class MockNetworkService: NetworkServiceInterface {
     var resultToReturn: [CoffeeModel] = []
     var errorToThrow: Error?
     
-    func fetchCoffeeList() async throws -> [CoffeeModel] {
+    func fetchCoffeeList(category: CoffeeCategory) async throws -> [CoffeeModel] {
         guard let errorToThrow else { return resultToReturn }
         throw errorToThrow
     }

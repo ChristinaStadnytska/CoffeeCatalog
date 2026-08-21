@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeCoffeeView: View {
-    @StateObject var viewModelCoffee = CoffeeListViewModel(coffees: [])
+    @State var viewModelCoffee = CoffeeListViewModel(coffees: [])
     @State private var path = NavigationPath()
     @State private var isPresentedAdding = false
     
@@ -20,7 +20,7 @@ struct HomeCoffeeView: View {
         case .loaded:
             ScrollView {
                 LazyVStack(spacing: 16.0) {
-                    ForEach(viewModelCoffee.coffees) { coffee in
+                    ForEach(viewModelCoffee.displayedCoffees) { coffee in
                         HomeCoffeeCell(coffeeItem: coffee) {
                             path.append(coffee)
                         } onUpdateItemTapped: { item in
@@ -58,9 +58,12 @@ struct HomeCoffeeView: View {
                 }
             })
             .navigationDestination(for: CoffeeModel.self) { route in
-                HomeCoffeeDetailView(coffeeItem: route)
+                HomeCoffeeDetailView(coffeeItem: route) { item in
+                    viewModelCoffee.toggleFavourite(item: item)
+                }
             }
             .navigationTitle("Coffee List")
+            .searchable(text: $viewModelCoffee.searchText, placement: .navigationBarDrawer)
             .task {
                 await viewModelCoffee.getCoffeeList()
             }
