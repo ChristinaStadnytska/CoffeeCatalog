@@ -30,7 +30,7 @@ final class NetworkService: NetworkServiceInterface {
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw NetworkError.badResponse(statusCode: -1)
             }
-            guard (200...209).contains(httpResponse.statusCode) else {
+            guard (200...299).contains(httpResponse.statusCode) else {
                 throw NetworkError.badResponse(statusCode: httpResponse.statusCode)
             }
             
@@ -99,7 +99,7 @@ final class NetworkService: NetworkServiceInterface {
                 completion(.failure(NetworkError.badResponse(statusCode: -1)))
                 return
             }
-            guard (200...209).contains(httpResponse.statusCode), let data else {
+            guard (200...299).contains(httpResponse.statusCode), let data else {
                 completion(.failure(NetworkError.badResponse(statusCode: httpResponse.statusCode)))
                 return
             }

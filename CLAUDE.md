@@ -29,9 +29,18 @@ Reference implementation to copy the shape of: `CoffeeListViewModel` +
 - Tests must never hit the real network. For ViewModel-level tests, inject
   `MockNetworkService` (see `CoffeeCatalogTests/MockNetworkService.swift`) —
   this is the current pattern, used in `CoffeeCatalogTests.swift`.
-- `NetworkService` itself has no dedicated tests yet (no `URLProtocol` stub
-  in place) — see "Known gaps" below before assuming its request/decoding
-  logic is covered.
+- `NetworkService`'s own request/decoding logic (as opposed to the ViewModel
+  layer) is covered via a `URLProtocol` stub — see
+  `CoffeeCatalogTests/StubURLProtocol.swift` and `NetworkServiceTests.swift`.
+  Because `NetworkService` calls `URLSession.shared` directly instead of an
+  injected session, the stub registers globally, which is why that suite is
+  `@Suite(.serialized)`. If `NetworkService` ever takes an injected
+  `URLSession`, the stub can move to a per-test `URLSessionConfiguration` and
+  the suite can go back to running in parallel.
+- Success range for HTTP responses is `200...299` (fixed from a previous
+  `200...209` typo that silently rejected valid 2xx responses above 209 —
+  harmless today since this API always returns exactly 200, but worth
+  knowing if a status code ever changes).
 
 ## When generating a new screen
 
@@ -53,9 +62,15 @@ Reference implementation to copy the shape of: `CoffeeListViewModel` +
 ## Known gaps — don't assume these are finished
 
 - Favourites are currently stored in memory only, no persistence yet.
-- `NetworkService` itself (as opposed to the ViewModel layer that wraps it)
-  has no test coverage yet — treat any change there as untested until proven
-  otherwise.
+- `NetworkError.invalidURL` and the non-`HTTPURLResponse` branch of
+  `badResponse(statusCode: -1)` are unreachable with the current
+  `CoffeeCategory`/URL construction and are intentionally left untested —
+  covering them would mean faking behavior that can't happen in production
+  rather than testing real logic. Revisit only if `NetworkService` starts
+  accepting an injected/configurable base URL.
+- The Combine-based `fetchOnePublisher` path does not validate the HTTP
+  status code at all (only the async and GCD paths do) — not currently
+  exercised by the app's UI, but worth knowing if it's ever wired up.
 
 ## Spec format for new feature requests
 
